@@ -1,0 +1,2712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <!-- Responsive viewport -->
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    >
+
+    <meta
+        name="description"
+        content="Skillora - Improve your typing speed, accuracy and computer science skills with typing tests, practice, challenges and study notes."
+    >
+
+    <meta
+        name="keywords"
+        content="Skillora, typing practice, typing test, WPM, typing speed, computer science notes, programming notes, study notes"
+    >
+
+    <meta name="author" content="Skillora">
+
+    <!-- Prevent accidental phone-number formatting -->
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- Browser UI theme -->
+    <meta name="theme-color" content="#0b1220">
+
+    <title>Skillora — Typing & Study Platform</title>
+
+    <!-- Main stylesheet -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- =========================================================
+         SINGLE-FILE PAGE ROUTER
+         Keeps all existing Skillora features in this one index.html
+         while showing one feature/page at a time.
+         Uses URL hashes so it remains fully static-hosting compatible.
+    ========================================================== -->
+    <script>
+    (() => {
+        "use strict";
+
+        const pages = {
+            home: ["home", "cta-section"],
+            typing: ["typing"],
+            custom: ["custom-test"],
+            progress: ["progress"],
+            challenges: ["challenges"],
+            achievements: ["achievements"],
+            programming: ["programming"],
+            notes: ["notes", "pdf-viewer"]
+        };
+
+        const pageSections = [
+            "home",
+            "typing",
+            "custom-test",
+            "progress",
+            "challenges",
+            "achievements",
+            "programming",
+            "notes",
+            "pdf-viewer"
+        ];
+
+        function closeMobileMenu() {
+            const menu = document.querySelector(
+                "#mobile-menu, .mobile-menu, .nav-menu, .navigation-menu, #primary-navigation"
+            );
+            const button = document.querySelector(
+                "#mobile-menu-toggle, #menu-toggle, .menu-toggle, .hamburger"
+            );
+
+            if (menu) {
+                menu.classList.remove("active", "open");
+                menu.setAttribute("aria-expanded", "false");
+            }
+
+            if (button) {
+                button.classList.remove("active");
+                button.setAttribute("aria-expanded", "false");
+            }
+
+            document.body.classList.remove("menu-open");
+        }
+
+        function getPageFromHash() {
+            const raw = window.location.hash.replace(/^#/, "").trim().toLowerCase();
+            return pages[raw] ? raw : "home";
+        }
+
+        function showPage(pageName, updateHash = false) {
+            const page = pages[pageName] ? pageName : "home";
+            const visibleIds = new Set(pages[page]);
+
+            pageSections.forEach(id => {
+                const section = document.getElementById(id);
+                if (!section) return;
+
+                if (visibleIds.has(id)) {
+                    section.hidden = false;
+                    section.style.removeProperty("display");
+                    section.removeAttribute("data-skillora-page-hidden");
+                } else {
+                    section.hidden = true;
+                    section.setAttribute("data-skillora-page-hidden", "true");
+                    section.style.setProperty("display", "none", "important");
+                }
+            });
+
+            document.querySelectorAll(".nav-link").forEach(link => {
+                const href = (link.getAttribute("href") || "").replace(/^#/, "").toLowerCase();
+                link.classList.toggle("active", href === page);
+                link.setAttribute("aria-current", href === page ? "page" : "false");
+            });
+
+            closeMobileMenu();
+
+            if (updateHash && window.location.hash !== "#" + page) {
+                window.location.hash = page;
+                return;
+            }
+
+            window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+        }
+
+        function handleRouteClick(event) {
+            const link = event.target.closest("a[href^='#']");
+            if (!link) return;
+
+            const hash = (link.getAttribute("href") || "").replace(/^#/, "").trim().toLowerCase();
+            if (!pages[hash]) return;
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            showPage(hash, true);
+        }
+
+        document.addEventListener("click", handleRouteClick, true);
+        window.addEventListener("hashchange", () => showPage(getPageFromHash(), false));
+
+        function bootRouter() {
+            showPage(getPageFromHash(), false);
+        }
+
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", bootRouter, { once: true });
+        } else {
+            bootRouter();
+        }
+    })();
+    </script>
+
+    <!-- JavaScript loaded after HTML parsing -->
+    <script src="script.js" defer></script>
+</head>
+
+<body>
+
+    <!-- =========================================================
+         PAGE WRAPPER
+    ========================================================== -->
+    <div class="app-shell" id="app" data-app="skillora" data-version="1.0">
+
+        <!-- =====================================================
+             HEADER / NAVIGATION
+        ====================================================== -->
+        <header class="site-header" id="site-header">
+
+            <div class="container header-inner">
+
+                <!-- Logo -->
+                <a
+                    href="#home"
+                    class="brand"
+                    aria-label="Skillora Home"
+                >
+                    <img
+                        src="assets/skillora-logo.png"
+                        alt="Skillora"
+                        class="brand-logo"
+                        width="180"
+                        height="90"
+                        loading="eager"
+                        decoding="async"
+                    >
+                </a>
+
+                <!-- Mobile navigation button -->
+                <button
+                    type="button"
+                    class="mobile-menu-toggle"
+                    id="mobile-menu-toggle"
+                    aria-label="Open navigation menu"
+                    aria-controls="primary-navigation"
+                    aria-expanded="false"
+                >
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+
+                <!-- Main Navigation -->
+                <nav
+                    class="primary-navigation"
+                    id="primary-navigation"
+                    aria-label="Main navigation"
+                >
+                    <a href="#home" class="nav-link active" data-route="home">Home</a>
+                    <a href="#typing" class="nav-link" data-route="typing">Typing</a>
+                    <a href="#progress" class="nav-link" data-route="progress">Progress</a>
+                    <a href="#challenges" class="nav-link" data-route="challenges">Challenges</a>
+                    <a href="#notes" class="nav-link" data-route="notes">Study Notes</a>
+                    <a href="#achievements" class="nav-link" data-route="achievements">Achievements</a>
+                    <a href="#programming" class="nav-link" data-route="programming">Programming</a>
+                </nav>
+
+                <!-- Header CTA -->
+                <a
+                    href="#typing"
+                    class="header-cta"
+                >
+                    Start Typing
+                </a>
+
+            </div>
+        </header>
+
+
+        <main id="main-content" data-spa-shell="true">
+
+            <!-- =================================================
+                 HERO SECTION
+            ================================================== -->
+            <section
+                class="hero-section section"
+                id="home"
+                data-route-page="home"
+                data-page-title="Skillora — Home"
+                aria-labelledby="hero-title"
+            >
+
+                <div class="container hero-grid">
+
+                    <!-- Hero Content -->
+                    <div class="hero-content">
+
+                        <span class="eyebrow">
+                            LEARN • PRACTICE • IMPROVE
+                        </span>
+
+                        <h1 id="hero-title">
+                            Build Skills.
+                            <span>Type Faster.</span>
+                            Learn Smarter.
+                        </h1>
+
+                        <p class="hero-description">
+                            Skillora is a modern typing and computer science
+                            learning platform designed to help you improve
+                            your typing speed, accuracy and technical skills.
+                        </p>
+
+                        <div class="hero-actions">
+
+                            <a
+                                href="#typing"
+                                class="btn btn-primary"
+                            >
+                                Start Typing Test
+                            </a>
+
+                            <a
+                                href="#notes"
+                                class="btn btn-secondary"
+                            >
+                                Explore Study Notes
+                            </a>
+
+                        </div>
+
+                        <!-- Hero mini statistics -->
+                        <div class="hero-highlights">
+
+                            <div class="hero-highlight">
+                                <strong id="hero-best-wpm">0</strong>
+                                <span>Best WPM</span>
+                            </div>
+
+                            <div class="hero-highlight">
+                                <strong id="hero-total-tests">0</strong>
+                                <span>Tests Completed</span>
+                            </div>
+
+                            <div class="hero-highlight">
+                                <strong id="hero-streak">0</strong>
+                                <span>Day Streak</span>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Hero Visual / Typing Preview -->
+                    <div class="hero-visual">
+
+                        <div class="hero-dashboard-card">
+
+                            <div class="dashboard-card-header">
+
+                                <div>
+                                    <span class="card-label">
+                                        TYPING PERFORMANCE
+                                    </span>
+
+                                    <h2>Improve Every Test</h2>
+                                </div>
+
+                                <span
+                                    class="status-indicator"
+                                    aria-label="Ready"
+                                >
+                                    Ready
+                                </span>
+
+                            </div>
+
+                            <div class="hero-stat-grid">
+
+                                <div class="hero-stat-card">
+                                    <span>WPM</span>
+                                    <strong>72</strong>
+                                </div>
+
+                                <div class="hero-stat-card">
+                                    <span>Accuracy</span>
+                                    <strong>97%</strong>
+                                </div>
+
+                                <div class="hero-stat-card">
+                                    <span>Errors</span>
+                                    <strong>4</strong>
+                                </div>
+
+                            </div>
+
+                            <div class="mini-progress">
+                                <div class="mini-progress-bar"></div>
+                            </div>
+
+                            <p class="hero-preview-text">
+                                Practice consistently and track your
+                                improvement with Skillora.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </section>
+
+
+            <!-- =================================================
+                 QUICK FEATURES
+            ================================================== -->
+            <section
+                class="features-section section"
+                data-route-page="home"
+                aria-labelledby="features-title"
+            >
+
+                <div class="container">
+
+                    <div class="section-heading centered">
+                        <span class="eyebrow">SKILLORA FEATURES</span>
+
+                        <h2 id="features-title">
+                            Everything you need to improve
+                        </h2>
+
+                        <p>
+                            Practice typing, monitor your performance and
+                            access computer science study material from one
+                            place.
+                        </p>
+                    </div>
+
+
+                    <div class="feature-grid">
+
+                        <article class="feature-card">
+                            <div class="feature-icon">⌨</div>
+
+                            <h3>Typing Practice</h3>
+
+                            <p>
+                                Improve your typing speed and accuracy through
+                                focused practice sessions.
+                            </p>
+
+                            <a href="#typing" class="text-link">
+                                Practice now →
+                            </a>
+                        </article>
+
+
+                        <article class="feature-card">
+                            <div class="feature-icon">⚡</div>
+
+                            <h3>Typing Tests</h3>
+
+                            <p>
+                                Take timed tests and measure WPM, accuracy,
+                                errors and characters.
+                            </p>
+
+                            <a href="#typing" class="text-link">
+                                Take a test →
+                            </a>
+                        </article>
+
+
+                        <article class="feature-card">
+                            <div class="feature-icon">📈</div>
+
+                            <h3>Track Progress</h3>
+
+                            <p>
+                                Keep track of your performance and see how
+                                your typing skills improve over time.
+                            </p>
+
+                            <a href="#progress" class="text-link">
+                                View progress →
+                            </a>
+                        </article>
+
+
+                        <article class="feature-card">
+                            <div class="feature-icon">📚</div>
+
+                            <h3>Study Notes</h3>
+
+                            <p>
+                                Access organized computer science and
+                                programming PDF notes.
+                            </p>
+
+                            <a href="#notes" class="text-link">
+                                Browse notes →
+                            </a>
+                        </article>
+
+                    </div>
+
+                </div>
+            </section>
+
+
+            <!-- =================================================
+                 TYPING TEST SECTION
+            ================================================== -->
+            <section
+                class="typing-section section"
+                id="typing"
+                data-route-page="typing"
+                data-page-title="Skillora — Typing Test"
+                aria-labelledby="typing-title"
+            >
+
+                <div class="container">
+
+                    <div class="section-heading">
+
+                        <span class="eyebrow">
+                            TYPING LAB
+                        </span>
+
+                        <h2 id="typing-title">
+                            Test your typing skills
+                        </h2>
+
+                        <p>
+                            Choose a duration, type the displayed text and
+                            measure your real-time performance.
+                        </p>
+
+                    </div>
+
+
+                    <!-- Typing test application -->
+                    <div
+                        class="typing-test-card"
+                        id="typing-test"
+                        data-test-state="ready"
+                        data-session-id=""
+                    >
+
+                        <!-- Test toolbar -->
+                        <div class="typing-toolbar">
+
+                            <div class="typing-toolbar-group">
+
+                                <span class="toolbar-label">
+                                    Test Duration
+                                </span>
+
+                                <div
+                                    class="duration-options"
+                                    role="group"
+                                    aria-label="Test duration"
+                                >
+
+                                    <button
+                                        type="button"
+                                        class="duration-btn active"
+                                        data-duration="15"
+                                        aria-pressed="true"
+                                    >
+                                        15s
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        class="duration-btn"
+                                        data-duration="30"
+                                        aria-pressed="false"
+                                    >
+                                        30s
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        class="duration-btn"
+                                        data-duration="60"
+                                        aria-pressed="false"
+                                    >
+                                        60s
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        class="duration-btn"
+                                        data-duration="120"
+                                        aria-pressed="false"
+                                    >
+                                        120s
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="typing-toolbar-group">
+
+                                <span class="toolbar-label">
+                                    Test Type
+                                </span>
+
+                                <label class="select-wrapper">
+
+                                    <span class="sr-only">
+                                        Select typing test type
+                                    </span>
+
+                                    <select
+                                        id="typing-mode"
+                                        name="typing-mode"
+                                    >
+                                        <option value="standard">
+                                            Standard
+                                        </option>
+
+                                        <option value="programming">
+                                            Programming
+                                        </option>
+
+                                        <option value="custom">
+                                            Custom
+                                        </option>
+                                    </select>
+
+                                </label>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Live stats -->
+                        <div
+                            class="typing-live-stats"
+                            aria-live="polite"
+                        >
+
+                            <div class="typing-stat">
+                                <span>WPM</span>
+                                <strong id="live-wpm">0</strong>
+                            </div>
+
+                            <div class="typing-stat">
+                                <span>Accuracy</span>
+                                <strong id="live-accuracy">100%</strong>
+                            </div>
+
+                            <div class="typing-stat">
+                                <span>Errors</span>
+                                <strong id="live-errors">0</strong>
+                            </div>
+
+                            <div class="typing-stat timer-stat">
+                                <span>Time</span>
+                                <strong
+                                    id="live-timer"
+                                    data-time="15"
+                                >
+                                    15
+                                </strong>
+                            </div>
+
+                        </div>
+
+
+                        <!-- Typing text area -->
+                        <div class="typing-workspace">
+
+                            <div class="typing-workspace-header">
+
+                                <span class="typing-status" id="typing-status">
+                                    Ready to start
+                                </span>
+
+                                <span
+                                    class="typing-progress-text"
+                                    id="typing-progress-text"
+                                >
+                                    0 characters
+                                </span>
+
+                            </div>
+
+
+                            <!-- Typing stage: the input is positioned directly over the prompt. -->
+                            <div class="typing-stage" id="typing-stage">
+
+                                <div
+                                    class="typing-prompt"
+                                    id="typing-prompt"
+                                    tabindex="0"
+                                    aria-label="Typing text"
+                                    aria-describedby="typing-help"
+                                >
+                                    <span class="typing-placeholder">
+                                        Press Start Test to begin typing.
+                                    </span>
+                                </div>
+
+                                <div class="typing-input-wrapper">
+
+                                    <label
+                                        for="typing-input"
+                                        class="sr-only"
+                                    >
+                                        Type directly over the displayed text
+                                    </label>
+
+                                    <textarea
+                                        id="typing-input"
+                                        name="typing-input"
+                                        class="typing-input typing-overlay-input"
+                                        rows="4"
+                                        spellcheck="false"
+                                        autocorrect="off"
+                                        autocapitalize="off"
+                                        autocomplete="off"
+                                        inputmode="text"
+                                        aria-label="Type the displayed text"
+                                        placeholder=""
+                                        disabled
+                                    ></textarea>
+
+                                </div>
+
+                            </div>
+
+                            <p class="typing-help" id="typing-help">
+                                Start the test and type the displayed text. Correct characters stay clear; wrong characters are highlighted in red.
+                            </p>
+
+
+                            <!-- Typing controls -->
+                            <div class="typing-controls">
+
+                                <button
+                                    type="button"
+                                    class="btn btn-primary"
+                                    id="start-test-btn"
+                                >
+                                    Start Test
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="btn btn-secondary"
+                                    id="restart-test-btn"
+                                >
+                                    Restart
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="btn btn-ghost"
+                                    id="reset-test-btn"
+                                >
+                                    Reset
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Test result -->
+                        <section
+                            class="typing-result"
+                            id="typing-result"
+                            hidden
+                            aria-labelledby="result-title"
+                        >
+
+                            <div class="result-header">
+
+                                <div>
+                                    <span class="eyebrow">
+                                        TEST COMPLETE
+                                    </span>
+
+                                    <h3 id="result-title">
+                                        Your Typing Result
+                                    </h3>
+                                </div>
+
+                                <span
+                                    class="result-badge"
+                                    id="result-badge"
+                                >
+                                    Completed
+                                </span>
+
+                            </div>
+
+
+                            <div class="result-stat-grid">
+
+                                <div class="result-stat">
+                                    <span>WPM</span>
+                                    <strong id="result-wpm">0</strong>
+                                </div>
+
+                                <div class="result-stat">
+                                    <span>Accuracy</span>
+                                    <strong id="result-accuracy">
+                                        0%
+                                    </strong>
+                                </div>
+
+                                <div class="result-stat">
+                                    <span>Errors</span>
+                                    <strong id="result-errors">0</strong>
+                                </div>
+
+                                <div class="result-stat">
+                                    <span>Characters</span>
+                                    <strong id="result-characters">
+                                        0
+                                    </strong>
+                                </div>
+
+                                <div class="result-stat">
+                                    <span>Test Time</span>
+                                    <strong id="result-time">
+                                        0s
+                                    </strong>
+                                </div>
+
+                                <div class="result-stat">
+                                    <span>Personal Best</span>
+                                    <strong id="result-best">
+                                        0 WPM
+                                    </strong>
+                                </div>
+
+                            </div>
+
+
+                            <div class="result-actions">
+
+                                <button
+                                    type="button"
+                                    class="btn btn-primary"
+                                    id="retry-test-btn"
+                                >
+                                    Try Again
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="btn btn-secondary"
+                                    id="result-close-btn"
+                                >
+                                    Back to Practice
+                                </button>
+
+                            </div>
+
+                        </section>
+
+                    </div>
+
+                </div>
+            </section>
+
+
+            <!-- =================================================
+                 CUSTOM TEST
+            ================================================== -->
+            <section
+                class="custom-test-section section"
+                id="custom-test"
+                data-route-page="typing"
+                aria-labelledby="custom-test-title"
+            >
+
+                <div class="container custom-test-grid">
+
+                    <div class="custom-test-content">
+
+                        <span class="eyebrow">
+                            CUSTOM PRACTICE
+                        </span>
+
+                        <h2 id="custom-test-title">
+                            Practice with your own text
+                        </h2>
+
+                        <p>
+                            Paste any text you want to practice with and use
+                            it as a custom typing challenge.
+                        </p>
+
+                    </div>
+
+
+                    <div class="custom-test-card">
+
+                        <label
+                            for="custom-text"
+                            class="form-label"
+                        >
+                            Custom typing text
+                        </label>
+
+                        <textarea
+                            id="custom-text"
+                            name="custom-text"
+                            class="form-textarea"
+                            rows="6"
+                            maxlength="5000"
+                            placeholder="Paste or type your custom practice text here..."
+                        ></textarea>
+
+                        <div class="form-footer">
+
+                            <span
+                                class="character-counter"
+                                id="custom-character-count"
+                            >
+                                0 / 5000
+                            </span>
+
+                            <button
+                                type="button"
+                                class="btn btn-primary"
+                                id="use-custom-text-btn"
+                            >
+                                Use This Text
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </section>
+
+
+            <!-- =================================================
+                 PROGRESS SECTION
+            ================================================== -->
+            <section
+                class="progress-section section"
+                id="progress"
+                data-route-page="progress"
+                data-page-title="Skillora — Progress"
+                aria-labelledby="progress-title"
+            >
+
+                <div class="container">
+
+                    <div class="section-heading">
+
+                        <span class="eyebrow">
+                            YOUR PERFORMANCE
+                        </span>
+
+                        <h2 id="progress-title">
+                            Track your progress
+                        </h2>
+
+                        <p>
+                            Your statistics are kept locally in your browser,
+                            so each visitor has their own independent progress.
+                        </p>
+
+                    </div>
+
+
+                    <!-- Main statistics -->
+                    <div class="progress-stat-grid">
+
+                        <article class="progress-card">
+                            <span class="progress-card-label">
+                                Best WPM
+                            </span>
+
+                            <strong
+                                id="progress-best-wpm"
+                                class="progress-card-value"
+                            >
+                                0
+                            </strong>
+
+                            <span class="progress-card-meta">
+                                Personal record
+                            </span>
+                        </article>
+
+
+                        <article class="progress-card">
+                            <span class="progress-card-label">
+                                Average WPM
+                            </span>
+
+                            <strong
+                                id="progress-average-wpm"
+                                class="progress-card-value"
+                            >
+                                0
+                            </strong>
+
+                            <span class="progress-card-meta">
+                                Across completed tests
+                            </span>
+                        </article>
+
+
+                        <article class="progress-card">
+                            <span class="progress-card-label">
+                                Accuracy
+                            </span>
+
+                            <strong
+                                id="progress-average-accuracy"
+                                class="progress-card-value"
+                            >
+                                0%
+                            </strong>
+
+                            <span class="progress-card-meta">
+                                Average accuracy
+                            </span>
+                        </article>
+
+
+                        <article class="progress-card">
+                            <span class="progress-card-label">
+                                Total Tests
+                            </span>
+
+                            <strong
+                                id="progress-total-tests"
+                                class="progress-card-value"
+                            >
+                                0
+                            </strong>
+
+                            <span class="progress-card-meta">
+                                Completed tests
+                            </span>
+                        </article>
+
+                    </div>
+
+
+                    <!-- Progress panels -->
+                    <div class="progress-dashboard">
+
+                        <!-- WPM history -->
+                        <article class="dashboard-panel">
+
+                            <div class="panel-header">
+
+                                <div>
+                                    <span class="panel-label">
+                                        PERFORMANCE
+                                    </span>
+
+                                    <h3>WPM History</h3>
+                                </div>
+
+                                <select
+                                    id="progress-period"
+                                    class="panel-select"
+                                    aria-label="Progress period"
+                                >
+                                    <option value="7">
+                                        Last 7 tests
+                                    </option>
+
+                                    <option value="30">
+                                        Last 30 tests
+                                    </option>
+
+                                    <option value="all">
+                                        All tests
+                                    </option>
+                                </select>
+
+                            </div>
+
+
+                            <div
+                                class="chart-container"
+                                id="wpm-chart"
+                                aria-label="WPM history chart"
+                                role="img"
+                            >
+                                <div class="chart-empty-state">
+                                    Complete a typing test to see your
+                                    performance history.
+                                </div>
+                            </div>
+
+                        </article>
+
+
+                        <!-- Accuracy -->
+                        <article class="dashboard-panel">
+
+                            <div class="panel-header">
+
+                                <div>
+                                    <span class="panel-label">
+                                        ACCURACY
+                                    </span>
+
+                                    <h3>Accuracy History</h3>
+                                </div>
+
+                            </div>
+
+
+                            <div
+                                class="chart-container"
+                                id="accuracy-chart"
+                                aria-label="Accuracy history chart"
+                                role="img"
+                            >
+                                <div class="chart-empty-state">
+                                    Your accuracy history will appear here.
+                                </div>
+                            </div>
+
+                        </article>
+
+                    </div>
+
+
+                    <!-- History table -->
+                    <article class="dashboard-panel history-panel">
+
+                        <div class="panel-header">
+
+                            <div>
+                                <span class="panel-label">
+                                    RECENT ACTIVITY
+                                </span>
+
+                                <h3>Test History</h3>
+                            </div>
+
+                            <button
+                                type="button"
+                                class="btn btn-small btn-ghost"
+                                id="clear-history-btn"
+                            >
+                                Clear History
+                            </button>
+
+                        </div>
+
+
+                        <div class="table-wrapper">
+
+                            <table class="history-table">
+
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Mode</th>
+                                        <th>WPM</th>
+                                        <th>Accuracy</th>
+                                        <th>Errors</th>
+                                        <th>Duration</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="history-table-body">
+
+                                    <tr class="empty-history-row">
+                                        <td colspan="6">
+                                            No tests completed yet.
+                                        </td>
+                                    </tr>
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </article>
+
+                </div>
+            </section>
+
+
+            <!-- =================================================
+                 DAILY CHALLENGE
+            ================================================== -->
+            <section
+                class="challenge-section section"
+                id="challenges"
+                data-route-page="challenges"
+                data-page-title="Skillora — Daily Challenge"
+                aria-labelledby="challenge-title"
+            >
+
+                <div class="container">
+
+                    <div class="challenge-card">
+
+                        <div class="challenge-content">
+
+                            <span class="eyebrow">
+                                DAILY CHALLENGE
+                            </span>
+
+                            <h2 id="challenge-title">
+                                One challenge. Every day.
+                            </h2>
+
+                            <p>
+                                Build a consistent typing habit by completing
+                                a fresh daily typing challenge.
+                            </p>
+
+                            <div class="challenge-meta">
+
+                                <span>
+                                    <strong id="challenge-duration">
+                                        60s
+                                    </strong>
+                                    duration
+                                </span>
+
+                                <span>
+                                    <strong id="challenge-target">
+                                        50
+                                    </strong>
+                                    target WPM
+                                </span>
+
+                                <span>
+                                    <strong id="challenge-status">
+                                        Not completed
+                                    </strong>
+                                </span>
+
+                            </div>
+
+                            <button
+                                type="button"
+                                class="btn btn-primary"
+                                id="start-challenge-btn"
+                            >
+                                Start Daily Challenge
+                            </button>
+
+                        </div>
+
+
+                        <div class="challenge-visual">
+
+                            <div class="challenge-circle">
+
+                                <span>DAY</span>
+
+                                <strong id="challenge-day">
+                                    01
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </section>
+
+
+            <!-- =================================================
+                 ACHIEVEMENTS
+            ================================================== -->
+            <section
+                class="achievements-section section"
+                id="achievements"
+                data-route-page="achievements"
+                data-page-title="Skillora — Achievements"
+                aria-labelledby="achievements-title"
+            >
+
+                <div class="container">
+
+                    <div class="section-heading">
+
+                        <span class="eyebrow">
+                            ACHIEVEMENTS
+                        </span>
+
+                        <h2 id="achievements-title">
+                            Keep improving
+                        </h2>
+
+                        <p>
+                            Unlock milestones as you build your typing habit.
+                        </p>
+
+                    </div>
+
+
+                    <div class="achievement-grid">
+
+                        <article
+                            class="achievement-card"
+                            data-achievement="first-test"
+                        >
+                            <div class="achievement-icon">
+                                ★
+                            </div>
+
+                            <div>
+                                <h3>First Test</h3>
+
+                                <p>
+                                    Complete your first typing test.
+                                </p>
+                            </div>
+
+                            <span class="achievement-status">
+                                Locked
+                            </span>
+                        </article>
+
+
+                        <article
+                            class="achievement-card"
+                            data-achievement="speed-40"
+                        >
+                            <div class="achievement-icon">
+                                ⚡
+                            </div>
+
+                            <div>
+                                <h3>40 WPM</h3>
+
+                                <p>
+                                    Reach 40 WPM in a test.
+                                </p>
+                            </div>
+
+                            <span class="achievement-status">
+                                Locked
+                            </span>
+                        </article>
+
+
+                        <article
+                            class="achievement-card"
+                            data-achievement="speed-60"
+                        >
+                            <div class="achievement-icon">
+                                🚀
+                            </div>
+
+                            <div>
+                                <h3>60 WPM</h3>
+
+                                <p>
+                                    Reach 60 WPM in a test.
+                                </p>
+                            </div>
+
+                            <span class="achievement-status">
+                                Locked
+                            </span>
+                        </article>
+
+
+                        <article
+                            class="achievement-card"
+                            data-achievement="speed-80"
+                        >
+                            <div class="achievement-icon">
+                                💎
+                            </div>
+
+                            <div>
+                                <h3>80 WPM</h3>
+
+                                <p>
+                                    Reach 80 WPM in a test.
+                                </p>
+                            </div>
+
+                            <span class="achievement-status">
+                                Locked
+                            </span>
+                        </article>
+
+
+                        <article
+                            class="achievement-card"
+                            data-achievement="accuracy-95"
+                        >
+                            <div class="achievement-icon">
+                                🎯
+                            </div>
+
+                            <div>
+                                <h3>95% Accuracy</h3>
+
+                                <p>
+                                    Achieve at least 95% accuracy.
+                                </p>
+                            </div>
+
+                            <span class="achievement-status">
+                                Locked
+                            </span>
+                        </article>
+
+
+                        <article
+                            class="achievement-card"
+                            data-achievement="tests-10"
+                        >
+                            <div class="achievement-icon">
+                                🔥
+                            </div>
+
+                            <div>
+                                <h3>10 Tests</h3>
+
+                                <p>
+                                    Complete 10 typing tests.
+                                </p>
+                            </div>
+
+                            <span class="achievement-status">
+                                Locked
+                            </span>
+                        </article>
+
+                    </div>
+
+                </div>
+            </section>
+
+
+            <!-- =================================================
+                 PROGRAMMING TYPING
+            ================================================== -->
+            <section
+                class="programming-section section"
+                id="programming"
+                data-route-page="programming"
+                data-page-title="Skillora — Programming Typing"
+                aria-labelledby="programming-title"
+            >
+
+                <div class="container programming-grid">
+
+                    <div class="programming-content">
+
+                        <span class="eyebrow">
+                            PROGRAMMING TYPING
+                        </span>
+
+                        <h2 id="programming-title">
+                            Type code.
+                            <span>Build speed.</span>
+                        </h2>
+
+                        <p>
+                            Practice programming syntax and improve your
+                            typing confidence while working with real code
+                            patterns.
+                        </p>
+
+                        <div class="programming-tags">
+
+                            <span>Python</span>
+                            <span>C</span>
+                            <span>C++</span>
+                            <span>Java</span>
+                            <span>JavaScript</span>
+
+                        </div>
+
+                        <button
+                            type="button"
+                            class="btn btn-primary"
+                            id="programming-test-btn"
+                        >
+                            Start Programming Test
+                        </button>
+
+                    </div>
+
+
+                    <div class="code-preview">
+
+                        <div class="code-window-header">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+
+                        <pre><code>function improveSkills() {
+    const practice = true;
+    const consistency = "daily";
+
+    if (practice && consistency) {
+        return "Keep improving!";
+    }
+}</code></pre>
+
+                    </div>
+
+                </div>
+            </section>
+
+
+            <!-- =================================================
+                 NOTES SECTION
+            ================================================== -->
+            <section
+                class="notes-section section"
+                id="notes"
+                data-route-page="notes"
+                data-page-title="Skillora — Study Notes"
+                aria-labelledby="notes-title"
+            >
+
+                <div class="container">
+
+                    <div class="section-heading">
+
+                        <span class="eyebrow">
+                            STUDY LIBRARY
+                        </span>
+
+                        <h2 id="notes-title">
+                            Computer Science Notes
+                        </h2>
+
+                        <p>
+                            Browse organized study material and open your PDF
+                            notes directly from Skillora.
+                        </p>
+
+                    </div>
+
+
+                    <!-- Notes controls -->
+                    <div class="notes-controls">
+
+                        <div class="notes-search">
+
+                            <label
+                                for="notes-search-input"
+                                class="sr-only"
+                            >
+                                Search study notes
+                            </label>
+
+                            <input
+                                type="search"
+                                id="notes-search-input"
+                                class="notes-search-input"
+                                placeholder="Search notes, subjects or topics..."
+                                autocomplete="off"
+                            >
+
+                            <span
+                                class="search-icon"
+                                aria-hidden="true"
+                            >
+                                ⌕
+                            </span>
+
+                        </div>
+
+
+                        <div
+                            class="category-filter"
+                            role="group"
+                            aria-label="Note categories"
+                        >
+
+                            <button
+                                type="button"
+                                class="category-btn active"
+                                data-category="all"
+                                aria-pressed="true"
+                            >
+                                All
+                            </button>
+
+                            <button
+                                type="button"
+                                class="category-btn"
+                                data-category="programming"
+                                aria-pressed="false"
+                            >
+                                Programming
+                            </button>
+
+                            <button
+                                type="button"
+                                class="category-btn"
+                                data-category="web"
+                                aria-pressed="false"
+                            >
+                                Web
+                            </button>
+
+                            <button
+                                type="button"
+                                class="category-btn"
+                                data-category="database"
+                                aria-pressed="false"
+                            >
+                                Database
+                            </button>
+
+                            <button
+                                type="button"
+                                class="category-btn"
+                                data-category="systems"
+                                aria-pressed="false"
+                            >
+                                Systems
+                            </button>
+
+                            <button
+                                type="button"
+                                class="category-btn"
+                                data-category="engineering"
+                                aria-pressed="false"
+                            >
+                                Engineering
+                            </button>
+
+                            <button
+                                type="button"
+                                class="category-btn"
+                                data-category="data"
+                                aria-pressed="false"
+                            >
+                                Data
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Notes result count -->
+                    <div
+                        class="notes-results-info"
+                        aria-live="polite"
+                    >
+                        <span id="notes-result-count">
+                            15 notes available
+                        </span>
+                    </div>
+
+
+                    <!-- Notes Grid -->
+                    <div
+                        class="notes-grid"
+                        id="notes-grid"
+                    >
+
+
+                        <!-- Computer Networks -->
+                        <article
+                            class="note-card"
+                            data-note
+                            data-category="systems"
+                            data-title="Computer Networks Notes"
+                            data-keywords="computer networks networking cn systems"
+                        >
+
+                            <div class="note-card-icon">
+                                📡
+                            </div>
+
+                            <div class="note-card-body">
+
+                                <span class="note-category">
+                                    Systems
+                                </span>
+
+                                <h3>
+                                    Computer Networks Notes
+                                </h3>
+
+                                <p>
+                                    Networking concepts and computer
+                                    communication study material.
+                                </p>
+
+                                <div class="note-actions">
+
+                                    <a
+                                        href="assets/notes/COMPUTER NETWORKS.pdf"
+                                        class="btn btn-small btn-primary note-view-btn"
+                                        target="_blank"
+                                        rel="noopener"
+                                    >
+                                        View PDF
+                                    </a>
+
+                                    <a
+                                        href="assets/notes/COMPUTER NETWORKS.pdf"
+                                        class="btn btn-small btn-secondary"
+                                        download
+                                    >
+                                        Download
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                        </article>
+
+
+                        <!-- CSS -->
+                        <article
+                            class="note-card"
+                            data-note
+                            data-category="web"
+                            data-title="CSS"
+                            data-keywords="css web styling frontend"
+                        >
+
+                            <div class="note-card-icon">
+                                🎨
+                            </div>
+
+                            <div class="note-card-body">
+
+                                <span class="note-category">
+                                    Web
+                                </span>
+
+                                <h3>CSS</h3>
+
+                                <p>
+                                    CSS concepts for styling modern web pages.
+                                </p>
+
+                                <div class="note-actions">
+
+                                    <a
+                                        href="assets/notes/CSS.pdf"
+                                        class="btn btn-small btn-primary note-view-btn"
+                                        target="_blank"
+                                        rel="noopener"
+                                    >
+                                        View PDF
+                                    </a>
+
+                                    <a
+                                        href="assets/notes/CSS.pdf"
+                                        class="btn btn-small btn-secondary"
+                                        download
+                                    >
+                                        Download
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                        </article>
+
+
+                        <!-- Data Engineering -->
+                        <article
+                            class="note-card"
+                            data-note
+                            data-category="data"
+                            data-title="Data Engineering"
+                            data-keywords="data engineering etl pipelines data"
+                        >
+
+                            <div class="note-card-icon">
+                                🗄️
+                            </div>
+
+                            <div class="note-card-body">
+
+                                <span class="note-category">
+                                    Data
+                                </span>
+
+                                <h3>Data Engineering</h3>
+
+                                <p>
+                                    Data engineering concepts and learning
+                                    material.
+                                </p>
+
+                                <div class="note-actions">
+
+                                    <a
+                                        href="assets/notes/Data Engineering.pdf"
+                                        class="btn btn-small btn-primary note-view-btn"
+                                        target="_blank"
+                                        rel="noopener"
+                                    >
+                                        View PDF
+                                    </a>
+
+                                    <a
+                                        href="assets/notes/Data Engineering.pdf"
+                                        class="btn btn-small btn-secondary"
+                                        download
+                                    >
+                                        Download
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                        </article>
+
+
+                        <!-- Data Structures -->
+                        <article
+                            class="note-card"
+                            data-note
+                            data-category="programming"
+                            data-title="Data Structures Through Python"
+                            data-keywords="data structures python dsa algorithms programming"
+                        >
+
+                            <div class="note-card-icon">
+                                🧩
+                            </div>
+
+                            <div class="note-card-body">
+
+                                <span class="note-category">
+                                    Programming
+                                </span>
+
+                                <h3>
+                                    Data Structures Through Python
+                                </h3>
+
+                                <p>
+                                    Data structures and algorithm concepts
+                                    using Python.
+                                </p>
+
+                                <div class="note-actions">
+
+                                    <a
+                                        href="assets/notes/DATA STRUCTURES THROUGH PYTHON.pdf"
+                                        class="btn btn-small btn-primary note-view-btn"
+                                        target="_blank"
+                                        rel="noopener"
+                                    >
+                                        View PDF
+                                    </a>
+
+                                    <a
+                                        href="assets/notes/DATA STRUCTURES THROUGH PYTHON.pdf"
+                                        class="btn btn-small btn-secondary"
+                                        download
+                                    >
+                                        Download
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                        </article>
+
+
+                        <!-- DBMS -->
+                        <article
+                            class="note-card"
+                            data-note
+                            data-category="database"
+                            data-title="DBMS"
+                            data-keywords="dbms database database management systems"
+                        >
+
+                            <div class="note-card-icon">
+                                🗃️
+                            </div>
+
+                            <div class="note-card-body">
+
+                                <span class="note-category">
+                                    Database
+                                </span>
+
+                                <h3>DBMS</h3>
+
+                                <p>
+                                    Database management system concepts and
+                                    study notes.
+                                </p>
+
+                                <div class="note-actions">
+
+                                    <a
+                                        href="assets/notes/DBMS.pdf"
+                                        class="btn btn-small btn-primary note-view-btn"
+                                        target="_blank"
+                                        rel="noopener"
+                                    >
+                                        View PDF
+                                    </a>
+
+                                    <a
+                                        href="assets/notes/DBMS.pdf"
+                                        class="btn btn-small btn-secondary"
+                                        download
+                                    >
+                                        Download
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                        </article>
+
+
+                        <!-- HTML -->
+                        <article
+                            class="note-card"
+                            data-note
+                            data-category="web"
+                            data-title="HTML Tutorial"
+                            data-keywords="html html5 web frontend development"
+                        >
+
+                            <div class="note-card-icon">
+                                🌐
+                            </div>
+
+                            <div class="note-card-body">
+
+                                <span class="note-category">
+                                    Web
+                                </span>
+
+                                <h3>HTML Tutorial</h3>
+
+                                <p>
+                                    HTML fundamentals and web development
+                                    reference material.
+                                </p>
+
+                                <div class="note-actions">
+
+                                    <a
+                                        href="assets/notes/html_tutorial.pdf"
+                                        class="btn btn-small btn-primary note-view-btn"
+                                        target="_blank"
+                                        rel="noopener"
+                                    >
+                                        View PDF
+                                    </a>
+
+                                    <a
+                                        href="assets/notes/html_tutorial.pdf"
+                                        class="btn btn-small btn-secondary"
+                                        download
+                                    >
+                                        Download
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                        </article>
+
+
+                        <!-- Java -->
+                        <article
+                            class="note-card"
+                            data-note
+                            data-category="programming"
+                            data-title="Java Programming"
+                            data-keywords="java programming oop coding"
+                        >
+
+                            <div class="note-card-icon">
+                                ☕
+                            </div>
+
+                            <div class="note-card-body">
+
+                                <span class="note-category">
+                                    Programming
+                                </span>
+
+                                <h3>Java Programming</h3>
+
+                                <p>
+                                    Java programming concepts and study notes.
+                                </p>
+
+                                <div class="note-actions">
+
+                                    <a
+                                        href="assets/notes/Java Programming.pdf"
+                                        class="btn btn-small btn-primary note-view-btn"
+                                        target="_blank"
+                                        rel="noopener"
+                                    >
+                                        View PDF
+                                    </a>
+
+                                    <a
+                                        href="assets/notes/Java Programming.pdf"
+                                        class="btn btn-small btn-secondary"
+                                        download
+                                    >
+                                        Download
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                        </article>
+
+
+                        <!-- JavaScript -->
+                        <article
+                            class="note-card"
+                            data-note
+                            data-category="web"
+                            data-title="JS Notes"
+                            data-keywords="javascript js web programming frontend"
+                        >
+
+                            <div class="note-card-icon">
+                                ⚙️
+                            </div>
+
+                            <div class="note-card-body">
+
+                                <span class="note-category">
+                                    Web
+                                </span>
+
+                                <h3>JavaScript Notes</h3>
+
+                                <p>
+                                    JavaScript concepts for interactive web
+                                    development.
+                                </p>
+
+                                <div class="note-actions">
+
+                                    <a
+                                        href="assets/notes/JS Notes.pdf"
+                                        class="btn btn-small btn-primary note-view-btn"
+                                        target="_blank"
+                                        rel="noopener"
+                                    >
+                                        View PDF
+                                    </a>
+
+                                    <a
+                                        href="assets/notes/JS Notes.pdf"
+                                        class="btn btn-small btn-secondary"
+                                        download
+                                    >
+                                        Download
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                        </article>
+
+
+                        <!-- C++ -->
+                        <article
+                            class="note-card"
+                            data-note
+                            data-category="programming"
+                            data-title="OOP Using C++"
+                            data-keywords="c++ cpp oop object oriented programming"
+                        >
+
+                            <div class="note-card-icon">
+                                💻
+                            </div>
+
+                            <div class="note-card-body">
+
+                                <span class="note-category">
+                                    Programming
+                                </span>
+
+                                <h3>OOP Using C++</h3>
+
+                                <p>
+                                    Object-oriented programming concepts using
+                                    C++.
+                                </p>
+
+                                <div class="note-actions">
+
+                                    <a
+                                        href="assets/notes/OOP USING C++.pdf"
+                                        class="btn btn-small btn-primary note-view-btn"
+                                        target="_blank"
+                                        rel="noopener"
+                                    >
+                                        View PDF
+                                    </a>
+
+                                    <a
+                                        href="assets/notes/OOP USING C++.pdf"
+                                        class="btn btn-small btn-secondary"
+                                        download
+                                    >
+                                        Download
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                        </article>
+
+
+                        <!-- Operating Systems -->
+                        <article
+                            class="note-card"
+                            data-note
+                            data-category="systems"
+                            data-title="Operating Systems"
+                            data-keywords="operating systems os computer systems"
+                        >
+
+                            <div class="note-card-icon">
+                                🖥️
+                            </div>
+
+                            <div class="note-card-body">
+
+                                <span class="note-category">
+                                    Systems
+                                </span>
+
+                                <h3>Operating Systems</h3>
+
+                                <p>
+                                    Operating systems concepts and
+                                    fundamentals.
+                                </p>
+
+                                <div class="note-actions">
+
+                                    <a
+                                        href="assets/notes/OPERATING SYSTEMS.pdf"
+                                        class="btn btn-small btn-primary note-view-btn"
+                                        target="_blank"
+                                        rel="noopener"
+                                    >
+                                        View PDF
+                                    </a>
+
+                                    <a
+                                        href="assets/notes/OPERATING SYSTEMS.pdf"
+                                        class="btn btn-small btn-secondary"
+                                        download
+                                    >
+                                        Download
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                        </article>
+
+
+                        <!-- C -->
+                        <article
+                            class="note-card"
+                            data-note
+                            data-category="programming"
+                            data-title="Programming in C"
+                            data-keywords="c programming coding fundamentals"
+                        >
+
+                            <div class="note-card-icon">
+                                🔷
+                            </div>
+
+                            <div class="note-card-body">
+
+                                <span class="note-category">
+                                    Programming
+                                </span>
+
+                                <h3>Programming in C</h3>
+
+                                <p>
+                                    C programming fundamentals and concepts.
+                                </p>
+
+                                <div class="note-actions">
+
+                                    <a
+                                        href="assets/notes/PROGRAMMING IN C.pdf"
+                                        class="btn btn-small btn-primary note-view-btn"
+                                        target="_blank"
+                                        rel="noopener"
+                                    >
+                                        View PDF
+                                    </a>
+
+                                    <a
+                                        href="assets/notes/PROGRAMMING IN C.pdf"
+                                        class="btn btn-small btn-secondary"
+                                        download
+                                    >
+                                        Download
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                        </article>
+
+
+                        <!-- Python -->
+                        <article
+                            class="note-card"
+                            data-note
+                            data-category="programming"
+                            data-title="Python Programming Notes"
+                            data-keywords="python programming coding"
+                        >
+
+                            <div class="note-card-icon">
+                                🐍
+                            </div>
+
+                            <div class="note-card-body">
+
+                                <span class="note-category">
+                                    Programming
+                                </span>
+
+                                <h3>Python Programming Notes</h3>
+
+                                <p>
+                                    Python programming concepts and
+                                    fundamentals.
+                                </p>
+
+                                <div class="note-actions">
+
+                                    <a
+                                        href="assets/notes/PYTHON PROGRAMMING NOTES.pdf"
+                                        class="btn btn-small btn-primary note-view-btn"
+                                        target="_blank"
+                                        rel="noopener"
+                                    >
+                                        View PDF
+                                    </a>
+
+                                    <a
+                                        href="assets/notes/PYTHON PROGRAMMING NOTES.pdf"
+                                        class="btn btn-small btn-secondary"
+                                        download
+                                    >
+                                        Download
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                        </article>
+
+
+                        <!-- Software Engineering -->
+                        <article
+                            class="note-card"
+                            data-note
+                            data-category="engineering"
+                            data-title="Software Engineering"
+                            data-keywords="software engineering development lifecycle"
+                        >
+
+                            <div class="note-card-icon">
+                                🛠️
+                            </div>
+
+                            <div class="note-card-body">
+
+                                <span class="note-category">
+                                    Engineering
+                                </span>
+
+                                <h3>Software Engineering</h3>
+
+                                <p>
+                                    Software engineering principles and
+                                    development concepts.
+                                </p>
+
+                                <div class="note-actions">
+
+                                    <a
+                                        href="assets/notes/SOFTWARE ENGINEERING.pdf"
+                                        class="btn btn-small btn-primary note-view-btn"
+                                        target="_blank"
+                                        rel="noopener"
+                                    >
+                                        View PDF
+                                    </a>
+
+                                    <a
+                                        href="assets/notes/SOFTWARE ENGINEERING.pdf"
+                                        class="btn btn-small btn-secondary"
+                                        download
+                                    >
+                                        Download
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                        </article>
+
+
+                        <!-- SQL -->
+                        <article
+                            class="note-card"
+                            data-note
+                            data-category="database"
+                            data-title="SQL Manual"
+                            data-keywords="sql database queries mysql database management"
+                        >
+
+                            <div class="note-card-icon">
+                                🧮
+                            </div>
+
+                            <div class="note-card-body">
+
+                                <span class="note-category">
+                                    Database
+                                </span>
+
+                                <h3>SQL Manual</h3>
+
+                                <p>
+                                    SQL queries, database concepts and
+                                    reference material.
+                                </p>
+
+                                <div class="note-actions">
+
+                                    <a
+                                        href="assets/notes/SQL-Manual.pdf"
+                                        class="btn btn-small btn-primary note-view-btn"
+                                        target="_blank"
+                                        rel="noopener"
+                                    >
+                                        View PDF
+                                    </a>
+
+                                    <a
+                                        href="assets/notes/SQL-Manual.pdf"
+                                        class="btn btn-small btn-secondary"
+                                        download
+                                    >
+                                        Download
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                        </article>
+
+
+                        <!-- Web Development -->
+                        <article
+                            class="note-card"
+                            data-note
+                            data-category="web"
+                            data-title="Web Development"
+                            data-keywords="web development frontend backend html css javascript"
+                        >
+
+                            <div class="note-card-icon">
+                                🌍
+                            </div>
+
+                            <div class="note-card-body">
+
+                                <span class="note-category">
+                                    Web
+                                </span>
+
+                                <h3>Web Development</h3>
+
+                                <p>
+                                    Web development concepts and learning
+                                    material.
+                                </p>
+
+                                <div class="note-actions">
+
+                                    <a
+                                        href="assets/notes/WEB DEVELOPMENT.pdf"
+                                        class="btn btn-small btn-primary note-view-btn"
+                                        target="_blank"
+                                        rel="noopener"
+                                    >
+                                        View PDF
+                                    </a>
+
+                                    <a
+                                        href="assets/notes/WEB DEVELOPMENT.pdf"
+                                        class="btn btn-small btn-secondary"
+                                        download
+                                    >
+                                        Download
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                        </article>
+
+
+                    </div>
+
+
+                    <!-- No search results -->
+                    <div
+                        class="notes-empty-state"
+                        id="notes-empty-state"
+                        hidden
+                    >
+                        <div class="empty-icon">🔎</div>
+
+                        <h3>No notes found</h3>
+
+                        <p>
+                            Try another search term or choose a different
+                            category.
+                        </p>
+
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            id="clear-notes-filter"
+                        >
+                            Clear Filters
+                        </button>
+                    </div>
+
+                </div>
+            </section>
+
+
+            <!-- =================================================
+                 PDF VIEWER
+            ================================================== -->
+            <section
+                class="pdf-viewer-section section"
+                id="pdf-viewer"
+                data-route-page="notes"
+                aria-labelledby="pdf-viewer-title"
+                hidden
+            >
+
+                <div class="container">
+
+                    <div class="pdf-viewer-card">
+
+                        <div class="pdf-viewer-header">
+
+                            <div>
+
+                                <span class="eyebrow">
+                                    STUDY VIEWER
+                                </span>
+
+                                <h2 id="pdf-viewer-title">
+                                    PDF Notes
+                                </h2>
+
+                            </div>
+
+                            <div class="pdf-viewer-actions">
+
+                                <a
+                                    href="#"
+                                    id="pdf-download-btn"
+                                    class="btn btn-small btn-secondary"
+                                    download
+                                >
+                                    Download
+                                </a>
+
+                                <button
+                                    type="button"
+                                    class="btn btn-small btn-ghost"
+                                    id="close-pdf-btn"
+                                >
+                                    Close
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="pdf-frame-wrapper">
+
+                            <iframe
+                                id="pdf-frame"
+                                title="Skillora PDF Viewer"
+                                src="about:blank"
+                                loading="lazy"
+                            ></iframe>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </section>
+
+
+            <!-- =================================================
+                 CTA
+            ================================================== -->
+            <section
+                class="cta-section section"
+                data-route-page="home"
+                aria-labelledby="cta-title"
+            >
+
+                <div class="container">
+
+                    <div class="cta-card">
+
+                        <div>
+
+                            <span class="eyebrow">
+                                START TODAY
+                            </span>
+
+                            <h2 id="cta-title">
+                                Turn practice into progress.
+                            </h2>
+
+                            <p>
+                                Improve your typing skills and strengthen
+                                your computer science knowledge with Skillora.
+                            </p>
+
+                        </div>
+
+                        <div class="cta-actions">
+
+                            <a
+                                href="#typing"
+                                class="btn btn-primary"
+                            >
+                                Start Practicing
+                            </a>
+
+                            <a
+                                href="#notes"
+                                class="btn btn-secondary"
+                            >
+                                Browse Notes
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </section>
+
+        </main>
+
+
+        <!-- =====================================================
+             FOOTER
+        ====================================================== -->
+        <footer class="site-footer">
+
+            <div class="container footer-grid">
+
+                <!-- Footer brand -->
+                <div class="footer-brand">
+
+                    <a
+                        href="#home"
+                        class="footer-logo-link"
+                        aria-label="Skillora Home"
+                    >
+                        <img
+                            src="assets/skillora-logo.png"
+                            alt="Skillora"
+                            class="footer-logo"
+                            width="150"
+                            height="75"
+                            loading="lazy"
+                            decoding="async"
+                        >
+                    </a>
+
+                    <p>
+                        A modern platform for typing practice, skill
+                        development and computer science study.
+                    </p>
+
+                </div>
+
+
+                <!-- Footer navigation -->
+                <div class="footer-column">
+
+                    <h3>Platform</h3>
+
+                    <a href="#typing">Typing Test</a>
+                    <a href="#progress">Progress</a>
+                    <a href="#challenges">Daily Challenge</a>
+                    <a href="#achievements">Achievements</a>
+
+                </div>
+
+
+                <div class="footer-column">
+
+                    <h3>Learning</h3>
+
+                    <a href="#notes">Study Notes</a>
+                    <a href="#programming">Programming Typing</a>
+                    <a href="#custom-test">Custom Test</a>
+
+                </div>
+
+
+                <div class="footer-column">
+
+                    <h3>Skillora</h3>
+
+                    <a href="#home">About</a>
+                    <a href="#home">Features</a>
+                    <a href="#home">Get Started</a>
+
+                </div>
+
+            </div>
+
+
+            <div class="container footer-bottom">
+
+                <p>
+                    © <span id="current-year"></span> Skillora.
+                    All rights reserved.
+                </p>
+
+                <p class="footer-status">
+                    Built for learning and improvement.
+                </p>
+
+            </div>
+
+        </footer>
+
+
+        <!-- =====================================================
+             GLOBAL NOTIFICATION
+        ====================================================== -->
+        <div
+            class="toast-container"
+            id="toast-container"
+            aria-live="polite"
+            aria-atomic="true"
+        ></div>
+
+
+        <!-- =====================================================
+             LOADING OVERLAY
+        ====================================================== -->
+        <div
+            class="page-loader"
+            id="page-loader"
+            aria-hidden="true"
+            hidden
+            data-no-blocking-loader="true"
+        >
+            <div class="loader-content">
+                <div class="loader-spinner"></div>
+
+                <span>
+                    Loading Skillora...
+                </span>
+            </div>
+        </div>
+
+
+    </div>
+
+
+    <!-- =========================================================
+         NOSCRIPT FALLBACK
+    ========================================================== -->
+    <noscript>
+
+        <div class="noscript-message">
+
+            <h2>JavaScript is required</h2>
+
+            <p>
+                Skillora's interactive typing tests, progress tracking and
+                notes filtering require JavaScript to be enabled.
+            </p>
+
+        </div>
+
+    </noscript>
+
+</body>
+</html>
